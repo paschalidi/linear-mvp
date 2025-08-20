@@ -1,5 +1,6 @@
 'use client';
 
+import { useState } from 'react';
 import { Task, Status } from '@/types/task';
 import { TaskCard } from './task-card';
 import { Badge } from '@/components/ui/badge';
@@ -10,6 +11,10 @@ interface TaskColumnProps {
   title: string;
   tasks: Task[];
   onTaskClick: (task: Task) => void;
+  onTaskDrop: (taskId: string, newStatus: Status) => void;
+  draggedTaskId: string | null;
+  onDragStart: (task: Task) => void;
+  onDragEnd: () => void;
 }
 
 const columnConfig = {
@@ -30,11 +35,49 @@ const columnConfig = {
   },
 };
 
-export function TaskColumn({ status, title, tasks, onTaskClick }: TaskColumnProps) {
+export function TaskColumn({
+  status,
+  title,
+  tasks,
+  onTaskClick,
+  onTaskDrop,
+  draggedTaskId,
+  onDragStart,
+  onDragEnd
+}: TaskColumnProps) {
   const config = columnConfig[status];
+  const [isDragOver, setIsDragOver] = useState(false);
+
+  const handleDragOver = (e: React.DragEvent) => {
+    e.preventDefault();
+    e.dataTransfer.dropEffect = 'move';
+    setIsDragOver(true);
+  };
+
+  const handleDragLeave = (e: React.DragEvent) => {
+    // Only set to false if we're leaving the column entirely
+    if (!e.currentTarget.contains(e.relatedTarget as Node)) {
+      setIsDragOver(false);
+    }
+  };
+
+  const handleDrop = (e: React.DragEvent) => {
+    e.preventDefault();
+    setIsDragOver(false);
+
+    const taskId = e.dataTransfer.getData('text/plain');
+    if (taskId) {
+      onTaskDrop(taskId, status);
+    }
+  };
 
   return (
-    <div className="flex flex-col h-full">
+    <div
+      className="flex flex-col h-full"
+      onDragOver={handleDragOver}
+      onDragLeave={handleDragLeave}
+      onDrop={handleDrop}
+    >
       {/* Column Header */}
       <div className="flex items-center justify-between p-4 border-b border-border">
         <div className="flex items-center gap-3">
@@ -52,12 +95,16 @@ export function TaskColumn({ status, title, tasks, onTaskClick }: TaskColumnProp
 
       {/* Tasks Container */}
       <div className={cn(
-        'flex-1 p-3 space-y-2 overflow-y-auto rounded-b-lg',
-        config.bgColor
+        'flex-1 p-3 space-y-2 overflow-y-auto rounded-b-lg transition-colors duration-200',
+        config.bgColor,
+        isDragOver && 'bg-muted/50 ring-2 ring-primary/20 ring-inset'
       )}>
         {tasks.length === 0 ? (
-          <div className="flex items-center justify-center h-32 text-muted-foreground text-sm">
-            No issues yet
+          <div className={cn(
+            "flex items-center justify-center h-32 text-muted-foreground text-sm transition-all duration-200",
+            isDragOver && "text-primary/70"
+          )}>
+            {isDragOver ? 'Drop here' : 'No issues yet'}
           </div>
         ) : (
           tasks.map((task) => (
@@ -65,6 +112,9 @@ export function TaskColumn({ status, title, tasks, onTaskClick }: TaskColumnProp
               key={task.id}
               task={task}
               onClick={onTaskClick}
+              onDragStart={onDragStart}
+              onDragEnd={onDragEnd}
+              isDragging={draggedTaskId === task.id}
             />
           ))
         )}

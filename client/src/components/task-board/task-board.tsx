@@ -2,13 +2,14 @@
 
 import { useState, useMemo } from 'react';
 import { Plus, Search } from 'lucide-react';
-import { useTasks } from '@/lib/hooks/use-tasks';
+import { useTasks, useUpdateTask } from '@/lib/hooks/use-tasks';
 import { Task, Status } from '@/types/task';
 import { TaskColumn } from './task-column';
 import { AddTaskModal } from './add-task-modal';
 import { TaskDetailDrawer } from './task-detail-drawer';
 import { AppLayout } from '@/components/layout/app-layout';
 import { Button } from '@/components/ui/button';
+import { useDragDrop } from '@/lib/hooks/use-drag-drop';
 
 const columns = [
   {
@@ -35,6 +36,15 @@ export function TaskBoard() {
   const [searchQuery, setSearchQuery] = useState('');
 
   const { data: tasks = [], error } = useTasks();
+  const updateTaskMutation = useUpdateTask();
+
+  // Drag and drop functionality
+  const {
+    draggedTaskId,
+    handleDragStart,
+    handleDragEnd,
+    handleTaskDrop
+  } = useDragDrop();
 
   // Filter tasks based on search query
   const filteredTasks = useMemo(() => {
@@ -67,6 +77,17 @@ export function TaskBoard() {
   const handleCloseDetailDrawer = () => {
     setIsDetailDrawerOpen(false);
     setSelectedTask(null);
+  };
+
+  const handleTaskDropOnColumn = async (taskId: string, newStatus: Status) => {
+    try {
+      await updateTaskMutation.mutateAsync({
+        id: taskId,
+        updates: { status: newStatus }
+      });
+    } catch (error) {
+      console.error('Failed to update task status:', error);
+    }
   };
 
   if (error) {
@@ -106,6 +127,10 @@ export function TaskBoard() {
                 title={column.title}
                 tasks={tasksByStatus[column.status] || []}
                 onTaskClick={handleTaskClick}
+                onTaskDrop={(taskId, newStatus) => handleTaskDrop(taskId, newStatus, handleTaskDropOnColumn)}
+                draggedTaskId={draggedTaskId}
+                onDragStart={handleDragStart}
+                onDragEnd={handleDragEnd}
               />
             </div>
           ))}

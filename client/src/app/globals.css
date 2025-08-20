@@ -190,4 +190,14 @@
     scrollbar-width: thin;
     scrollbar-color: hsl(var(--muted-foreground) / 0.3) transparent;
   }
+
+  /* Drag and drop styles */
+  .dragging {
+    cursor: grabbing !important;
+  }
+
+  .drag-preview {
+    transform: rotate(5deg) scale(1.05);
+    box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+  }
 }

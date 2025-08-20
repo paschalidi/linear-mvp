@@ -7,6 +7,8 @@ import { cn } from '@/lib/utils';
 interface TaskCardProps {
   task: Task;
   onClick: (task: Task) => void;
+  onDragStart?: (task: Task) => void;
+  onDragEnd?: () => void;
   isDragging?: boolean;
 }
 
@@ -28,17 +30,43 @@ const statusConfig = {
   },
 };
 
-export function TaskCard({ task, onClick, isDragging = false }: TaskCardProps) {
+export function TaskCard({
+  task,
+  onClick,
+  onDragStart,
+  onDragEnd,
+  isDragging = false
+}: TaskCardProps) {
   const statusInfo = statusConfig[task.status];
+
+  const handleDragStart = (e: React.DragEvent) => {
+    e.dataTransfer.setData('text/plain', task.id);
+    e.dataTransfer.effectAllowed = 'move';
+    onDragStart?.(task);
+  };
+
+  const handleDragEnd = () => {
+    onDragEnd?.();
+  };
+
+  const handleClick = (e: React.MouseEvent) => {
+    // Prevent click when dragging
+    if (isDragging) return;
+    onClick(task);
+  };
 
   return (
     <Card
+      draggable
+      onDragStart={handleDragStart}
+      onDragEnd={handleDragEnd}
       className={cn(
         'cursor-pointer transition-all duration-200 hover:shadow-sm border-border/60',
-        'hover:border-border hover:shadow-md group bg-card',
-        isDragging && 'opacity-50 rotate-2 shadow-lg'
+        'hover:border-border hover:shadow-md group bg-card select-none',
+        isDragging && 'opacity-50 rotate-1 shadow-lg scale-105',
+        'active:cursor-grabbing'
       )}
-      onClick={() => onClick(task)}
+      onClick={handleClick}
     >
       <CardContent className="p-3">
         <div className="space-y-2">
