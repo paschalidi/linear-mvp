@@ -1,22 +1,18 @@
 import type { Metadata } from "next";
-import { Geist, Geist_Mono } from "next/font/google";
+import { Inter } from "next/font/google";
 import "./globals.css";
 import { QueryProvider } from "@/lib/providers/query-provider";
 import { Toaster } from "sonner";
 
-const geistSans = Geist({
-  variable: "--font-geist-sans",
+const inter = Inter({
+  variable: "--font-inter",
   subsets: ["latin"],
-});
-
-const geistMono = Geist_Mono({
-  variable: "--font-geist-mono",
-  subsets: ["latin"],
+  display: "swap",
 });
 
 export const metadata: Metadata = {
-  title: "Team Task Board",
-  description: "A Linear-inspired task management application",
+  title: "Linear",
+  description: "Linear helps streamline software projects, sprints, tasks, and bug tracking.",
 };
 
 export default function RootLayout({
@@ -25,10 +21,8 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en">
-      <body
-        className={`${geistSans.variable} ${geistMono.variable} antialiased`}
-      >
+    <html lang="en" className="h-full">
+      <body className={`${inter.variable} font-sans antialiased h-full bg-background text-foreground`}>
         <QueryProvider>
           {children}
           <Toaster position="top-right" />

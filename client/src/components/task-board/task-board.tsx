@@ -1,19 +1,19 @@
 'use client';
 
 import { useState, useMemo } from 'react';
-import { Plus, Search, Filter } from 'lucide-react';
+import { Plus, Search } from 'lucide-react';
 import { useTasks } from '@/lib/hooks/use-tasks';
 import { Task, Status } from '@/types/task';
 import { TaskColumn } from './task-column';
 import { AddTaskModal } from './add-task-modal';
 import { TaskDetailDrawer } from './task-detail-drawer';
+import { AppLayout } from '@/components/layout/app-layout';
 import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
 
 const columns = [
   {
     id: Status.TODO,
-    title: 'Todo',
+    title: 'Backlog',
     status: Status.TODO,
   },
   {
@@ -88,59 +88,19 @@ export function TaskBoard() {
   }
 
   return (
-    <div className="min-h-screen bg-slate-50">
-      {/* Header */}
-      <header className="bg-white border-b border-slate-200 sticky top-0 z-40">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex items-center justify-between h-16">
-            {/* Left side - Title */}
-            <div className="flex items-center">
-              <h1 className="text-xl font-semibold text-slate-900">
-                Team Task Board
-              </h1>
-            </div>
+    <AppLayout
+      title="My Issues"
+      subtitle="Track and manage your tasks"
+      onAddTask={() => setIsAddModalOpen(true)}
+      searchQuery={searchQuery}
+      onSearchChange={setSearchQuery}
+    >
 
-            {/* Center - Search */}
-            <div className="flex-1 max-w-md mx-8">
-              <div className="relative">
-                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-slate-400 h-4 w-4" />
-                <Input
-                  placeholder="Search tasks..."
-                  value={searchQuery}
-                  onChange={(e) => setSearchQuery(e.target.value)}
-                  className="pl-10 bg-slate-50 border-slate-200 focus:bg-white"
-                />
-              </div>
-            </div>
-
-            {/* Right side - Actions */}
-            <div className="flex items-center gap-3">
-              <Button
-                variant="outline"
-                size="sm"
-                className="text-slate-600 border-slate-200 hover:bg-slate-50"
-              >
-                <Filter className="h-4 w-4 mr-2" />
-                Filter
-              </Button>
-              <Button
-                onClick={() => setIsAddModalOpen(true)}
-                size="sm"
-                className="bg-slate-900 hover:bg-slate-800 text-white"
-              >
-                <Plus className="h-4 w-4 mr-2" />
-                Add Task
-              </Button>
-            </div>
-          </div>
-        </div>
-      </header>
-
-      {/* Main Content */}
-      <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 h-[calc(100vh-12rem)]">
+      {/* Board Content */}
+      <div className="p-6 max-w-7xl mx-auto w-full">
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 h-[calc(100vh-8rem)]">
           {columns.map((column) => (
-            <div key={column.id} className="bg-white rounded-lg border border-slate-200 shadow-sm">
+            <div key={column.id} className="bg-card rounded-lg border border-border shadow-sm">
               <TaskColumn
                 status={column.status}
                 title={column.title}
@@ -154,23 +114,22 @@ export function TaskBoard() {
         {/* Empty State */}
         {filteredTasks.length === 0 && !searchQuery && (
           <div className="text-center py-12">
-            <div className="mx-auto h-24 w-24 text-slate-300 mb-4">
+            <div className="mx-auto h-24 w-24 text-muted-foreground mb-4">
               <svg fill="currentColor" viewBox="0 0 24 24">
                 <path d="M13 3c0-1.1.9-2 2-2s2 .9 2 2v8c0 1.1-.9 2-2 2s-2-.9-2-2V3zM9 13c0-1.1.9-2 2-2s2 .9 2 2v8c0 1.1-.9 2-2 2s-2-.9-2-2v-8zM5 7c0-1.1.9-2 2-2s2 .9 2 2v14c0 1.1-.9 2-2 2s-2-.9-2-2V7z" />
               </svg>
             </div>
-            <h3 className="text-lg font-medium text-slate-900 mb-2">
-              No tasks yet
+            <h3 className="text-lg font-medium text-foreground mb-2">
+              No issues yet
             </h3>
-            <p className="text-slate-600 mb-6">
-              Get started by creating your first task.
+            <p className="text-muted-foreground mb-6">
+              Get started by creating your first issue.
             </p>
             <Button
               onClick={() => setIsAddModalOpen(true)}
-              className="bg-slate-900 hover:bg-slate-800 text-white"
             >
               <Plus className="h-4 w-4 mr-2" />
-              Create your first task
+              Create your first issue
             </Button>
           </div>
         )}
@@ -178,14 +137,14 @@ export function TaskBoard() {
         {/* No Search Results */}
         {filteredTasks.length === 0 && searchQuery && (
           <div className="text-center py-12">
-            <div className="mx-auto h-24 w-24 text-slate-300 mb-4">
+            <div className="mx-auto h-24 w-24 text-muted-foreground mb-4">
               <Search className="h-full w-full" />
             </div>
-            <h3 className="text-lg font-medium text-slate-900 mb-2">
-              No tasks found
+            <h3 className="text-lg font-medium text-foreground mb-2">
+              No issues found
             </h3>
-            <p className="text-slate-600 mb-6">
-              Try adjusting your search terms or create a new task.
+            <p className="text-muted-foreground mb-6">
+              Try adjusting your search terms or create a new issue.
             </p>
             <div className="flex items-center justify-center gap-3">
               <Button
@@ -196,15 +155,14 @@ export function TaskBoard() {
               </Button>
               <Button
                 onClick={() => setIsAddModalOpen(true)}
-                className="bg-slate-900 hover:bg-slate-800 text-white"
               >
                 <Plus className="h-4 w-4 mr-2" />
-                Add Task
+                New issue
               </Button>
             </div>
           </div>
         )}
-      </main>
+      </div>
 
       {/* Modals */}
       <AddTaskModal
@@ -217,6 +175,6 @@ export function TaskBoard() {
         open={isDetailDrawerOpen}
         onOpenChange={handleCloseDetailDrawer}
       />
-    </div>
+    </AppLayout>
   );
 }

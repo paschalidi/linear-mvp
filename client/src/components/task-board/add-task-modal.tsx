@@ -30,7 +30,7 @@ interface AddTaskModalProps {
 }
 
 const statusOptions = [
-  { value: Status.TODO, label: 'Todo' },
+  { value: Status.TODO, label: 'Backlog' },
   { value: Status.IN_PROGRESS, label: 'In Progress' },
   { value: Status.DONE, label: 'Done' },
 ];
@@ -78,9 +78,9 @@ export function AddTaskModal({ open, onOpenChange, defaultStatus = Status.TODO }
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="sm:max-w-[425px]">
         <DialogHeader>
-          <DialogTitle>Create new task</DialogTitle>
+          <DialogTitle>Create new issue</DialogTitle>
           <DialogDescription>
-            Add a new task to your board. Fill in the details below.
+            Add a new issue to your board. Fill in the details below.
           </DialogDescription>
         </DialogHeader>
         
@@ -89,7 +89,7 @@ export function AddTaskModal({ open, onOpenChange, defaultStatus = Status.TODO }
             <Label htmlFor="title">Title</Label>
             <Input
               id="title"
-              placeholder="Enter task title..."
+              placeholder="Enter issue title..."
               value={title}
               onChange={(e) => setTitle(e.target.value)}
               required
@@ -101,7 +101,7 @@ export function AddTaskModal({ open, onOpenChange, defaultStatus = Status.TODO }
             <Label htmlFor="description">Description</Label>
             <Textarea
               id="description"
-              placeholder="Enter task description..."
+              placeholder="Enter issue description..."
               value={description}
               onChange={(e) => setDescription(e.target.value)}
               rows={3}
@@ -137,7 +137,7 @@ export function AddTaskModal({ open, onOpenChange, defaultStatus = Status.TODO }
               type="submit"
               disabled={!title.trim() || createTaskMutation.isPending}
             >
-              {createTaskMutation.isPending ? 'Creating...' : 'Create Task'}
+              {createTaskMutation.isPending ? 'Creating...' : 'Create issue'}
             </Button>
           </DialogFooter>
         </form>
