@@ -1,20 +1,21 @@
 import express from 'express';
 import { prisma } from '../index';
-import { 
-  RegisterRequest, 
-  LoginRequest, 
-  AuthResponse, 
-  UserResponse 
+import {
+  RegisterRequest,
+  LoginRequest,
+  AuthResponse,
+  UserResponse
 } from '../types/auth';
 import { ApiResponse } from '../types/task';
-import { 
-  hashPassword, 
-  comparePassword, 
-  generateToken, 
-  isValidEmail, 
-  isValidPassword 
+import {
+  hashPassword,
+  comparePassword,
+  generateToken,
+  isValidEmail,
+  isValidPassword
 } from '../utils/auth';
 import { transformUser } from '../utils/userTransformer';
+import { authenticateToken, AuthenticatedRequest } from '../middleware/auth';
 
 const router = express.Router();
 
@@ -85,6 +86,14 @@ router.post('/register', async (req, res) => {
       email: user.email
     });
 
+    // Set HTTP-only cookie
+    res.cookie('auth_token', token, {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === 'production',
+      sameSite: 'lax',
+      maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days in milliseconds
+    });
+
     const response: ApiResponse<AuthResponse> = {
       success: true,
       data: {
@@ -148,6 +157,14 @@ router.post('/login', async (req, res) => {
       email: user.email
     });
 
+    // Set HTTP-only cookie
+    res.cookie('auth_token', token, {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === 'production',
+      sameSite: 'lax',
+      maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days in milliseconds
+    });
+
     const response: ApiResponse<AuthResponse> = {
       success: true,
       data: {
@@ -163,6 +180,61 @@ router.post('/login', async (req, res) => {
     const response: ApiResponse<never> = {
       success: false,
       error: 'Failed to login'
+    };
+    return res.status(500).json(response);
+  }
+});
+
+// GET /api/auth/me - Get current user
+router.get('/me', authenticateToken, async (req: AuthenticatedRequest, res) => {
+  try {
+    const userId = req.user!.id;
+
+    const user = await prisma.user.findUnique({
+      where: { id: userId }
+    });
+
+    if (!user) {
+      const response: ApiResponse<never> = {
+        success: false,
+        error: 'User not found'
+      };
+      return res.status(404).json(response);
+    }
+
+    const response: ApiResponse<UserResponse> = {
+      success: true,
+      data: transformUser(user)
+    };
+
+    return res.json(response);
+  } catch (error) {
+    console.error('Error getting current user:', error);
+    const response: ApiResponse<never> = {
+      success: false,
+      error: 'Failed to get user'
+    };
+    return res.status(500).json(response);
+  }
+});
+
+// POST /api/auth/logout - Logout user
+router.post('/logout', (req, res) => {
+  try {
+    // Clear the auth cookie
+    res.clearCookie('auth_token');
+
+    const response: ApiResponse<never> = {
+      success: true,
+      message: 'Logged out successfully'
+    };
+
+    return res.json(response);
+  } catch (error) {
+    console.error('Error logging out:', error);
+    const response: ApiResponse<never> = {
+      success: false,
+      error: 'Failed to logout'
     };
     return res.status(500).json(response);
   }

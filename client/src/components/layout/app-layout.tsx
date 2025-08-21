@@ -2,6 +2,8 @@
 
 import { ReactNode } from 'react';
 import { Header } from './header';
+import { Sidebar } from './sidebar';
+import { useAuthContext } from '@/lib/providers/auth-provider';
 import { cn } from '@/lib/utils';
 
 interface AppLayoutProps {
@@ -23,8 +25,22 @@ export function AppLayout({
   onSearchChange,
   className
 }: AppLayoutProps) {
+  const { isAuthenticated } = useAuthContext();
+
+  // For non-authenticated pages (login/register), don't show sidebar
+  if (!isAuthenticated) {
+    return (
+      <div className="h-screen flex flex-col bg-background">
+        <main className="flex-1 overflow-hidden">
+          {children}
+        </main>
+      </div>
+    );
+  }
+
   return (
     <div className="flex h-screen bg-background">
+      <Sidebar />
       {/* Main content area */}
       <div className="flex flex-1 flex-col overflow-hidden">
         {/* Header */}

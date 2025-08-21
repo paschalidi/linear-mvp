@@ -1,6 +1,5 @@
 import { ApiResponse } from "@/types/task";
 
-
 const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001';
 
 
@@ -23,6 +22,7 @@ export async function apiRequest<T>(
         'Content-Type': 'application/json',
         ...options.headers,
       },
+      credentials: 'include', // Include cookies for authentication
       cache: 'no-store',
       ...options,
     });

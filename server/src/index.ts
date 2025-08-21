@@ -9,7 +9,7 @@ import authRoutes from './routes/auth';
 // Load environment variables
 dotenv.config();
 
-const app = express();
+export const app = express();
 const port = process.env.PORT || 3001;
 
 // Initialize Prisma Client
