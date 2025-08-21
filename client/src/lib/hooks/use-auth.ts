@@ -2,10 +2,9 @@
 
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { login, logout as logoutAction, register } from '@/actions/auth';
-import { AuthState, User } from '@/types/auth';
-import { apiRequest } from '@/lib/apiRequest';
 import { toast } from 'sonner';
 import { useRouter } from "next/navigation";
+import { getCurrentUser } from "@/lib/auth-server";
 
 // Query keys
 export const authKeys = {
@@ -13,34 +12,12 @@ export const authKeys = {
   user: ['auth', 'user'] as const,
 };
 
-// Fetch current user from server
-async function fetchCurrentUser(): Promise<AuthState> {
-  try {
-    const response = await apiRequest<User>('/api/auth/me');
-
-    if (response.success && response.data) {
-      return {
-        user: response.data,
-        token: null, // Token is in HTTP-only cookie
-        isAuthenticated: true
-      };
-    }
-  } catch (error) {
-    // User not authenticated or error occurred
-  }
-
-  return {
-    user: null,
-    token: null,
-    isAuthenticated: false
-  };
-}
 
 // Hooks
 export function useAuth() {
   return useQuery({
     queryKey: authKeys.user,
-    queryFn: fetchCurrentUser,
+    queryFn: getCurrentUser,
     staleTime: 5 * 60 * 1000, // 5 minutes
     retry: false, // Don't retry auth failures
   });

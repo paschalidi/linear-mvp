@@ -1,10 +1,9 @@
-import { HydrationBoundary, dehydrate } from '@tanstack/react-query';
+import { dehydrate, HydrationBoundary } from '@tanstack/react-query';
 import { redirect } from 'next/navigation';
 import { TaskBoard } from '@/components/task-board/task-board';
 import { getQueryClient } from '@/lib/GetQueryClient';
 import { getCurrentUser } from '@/lib/auth-server';
 import { getTasks } from '@/actions/tasks';
-import { taskKeys } from '@/lib/hooks/use-tasks';
 
 export default async function Home() {
   // Check authentication on server side

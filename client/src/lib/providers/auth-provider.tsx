@@ -21,7 +21,7 @@ interface AuthProviderProps {
 }
 
 export function AuthProvider({ children }: AuthProviderProps) {
-  const { data: auth, isLoading } = useAuth();
+  const { data: user, isLoading } = useAuth();
   const loginMutation = useLogin();
   const registerMutation = useRegister();
   const logoutMutation = useLogout();
@@ -38,7 +38,18 @@ export function AuthProvider({ children }: AuthProviderProps) {
     logoutMutation.mutate();
   };
 
-  const isAuthenticated = auth?.isAuthenticated ?? false;
+  const isAuthenticated = user !== null;
+
+  // Create AuthState object from user data
+  const auth: AuthState | undefined = user ? {
+    user,
+    token: null, // Token is in HTTP-only cookie
+    isAuthenticated: true
+  } : {
+    user: null,
+    token: null,
+    isAuthenticated: false
+  };
 
   const value: AuthContextType = {
     auth,

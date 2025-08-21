@@ -5,9 +5,6 @@ import { CreateTaskRequest, Task, UpdateTaskRequest } from '@/types/task';
 import { apiRequest } from "@/lib/apiRequest";
 import { getAuthHeaders } from "@/lib/auth-utils";
 
-
-
-
 export async function getTasks(): Promise<Task[]> {
   try {
     const authHeaders = await getAuthHeaders();
