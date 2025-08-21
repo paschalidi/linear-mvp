@@ -1,7 +1,6 @@
 import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { TaskBoard } from '@/components/task-board/task-board';
-import { AuthProvider } from '@/lib/providers/auth-provider';
 import { Status } from '@/types/task';
 
 // Mock next/navigation
@@ -36,16 +35,29 @@ jest.mock('sonner', () => ({
 // Mock auth hooks
 jest.mock('@/lib/hooks/use-auth', () => ({
   useAuth: jest.fn(() => ({
-    data: {
-      user: { id: '1', email: 'test@example.com', name: 'Test User' },
-      token: null,
-      isAuthenticated: true
-    },
+    data: { id: '1', email: 'test@example.com', name: 'Test User' },
     isLoading: false
   })),
   useLogin: jest.fn(),
   useRegister: jest.fn(),
   useLogout: jest.fn(),
+}));
+
+// Mock auth context
+jest.mock('@/lib/providers/auth-provider', () => ({
+  AuthProvider: ({ children }: { children: React.ReactNode }) => children,
+  useAuthContext: jest.fn(() => ({
+    auth: {
+      user: { id: '1', email: 'test@example.com', name: 'Test User' },
+      token: null,
+      isAuthenticated: true
+    },
+    isLoading: false,
+    login: jest.fn(),
+    register: jest.fn(),
+    logout: jest.fn(),
+    isAuthenticated: true,
+  })),
 }));
 
 // Mock task hooks
@@ -108,9 +120,7 @@ const TestWrapper = ({ children }: { children: React.ReactNode }) => {
 
   return (
     <QueryClientProvider client={queryClient}>
-      <AuthProvider>
-        {children}
-      </AuthProvider>
+      {children}
     </QueryClientProvider>
   );
 };
