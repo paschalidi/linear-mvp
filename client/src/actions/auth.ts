@@ -1,10 +1,9 @@
 'use server';
 
 import { cookies } from 'next/headers';
-import { revalidateTag } from 'next/cache';
-import { LoginRequest, RegisterRequest, AuthResponse } from '@/types/auth';
-import { ApiResponse } from '@/types/task';
+import { AuthResponse, LoginRequest, RegisterRequest } from '@/types/auth';
 import { apiRequest } from "@/lib/apiRequest";
+import { redirect } from "next/navigation";
 
 export async function login({ email, password }: LoginRequest): Promise<AuthResponse> {
   try {
@@ -66,6 +65,7 @@ export async function logout(): Promise<void> {
     await apiRequest('/api/auth/logout', {
       method: 'POST',
     });
+    redirect('/login');
   } catch (error) {
     // Even if server call fails, we'll clear client-side data
     console.error('Server logout failed:', error);

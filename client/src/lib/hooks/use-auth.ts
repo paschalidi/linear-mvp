@@ -1,10 +1,11 @@
 'use client';
 
-import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { login, register, logout as logoutAction } from '@/actions/auth';
-import { LoginRequest, RegisterRequest, AuthState, User } from '@/types/auth';
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
+import { login, logout as logoutAction, register } from '@/actions/auth';
+import { AuthState, User } from '@/types/auth';
 import { apiRequest } from '@/lib/apiRequest';
 import { toast } from 'sonner';
+import { useRouter } from "next/navigation";
 
 // Query keys
 export const authKeys = {
@@ -47,6 +48,7 @@ export function useAuth() {
 
 export function useLogin() {
   const queryClient = useQueryClient();
+  const router = useRouter()
 
   return useMutation({
     mutationFn: login,
@@ -62,6 +64,7 @@ export function useLogin() {
       queryClient.invalidateQueries({ queryKey: ['tasks'] });
 
       toast.success('Login successful!');
+      router.push('/');
     },
     onError: (error) => {
       toast.error(error.message || 'Login failed');
@@ -71,6 +74,7 @@ export function useLogin() {
 
 export function useRegister() {
   const queryClient = useQueryClient();
+  const router = useRouter()
 
   return useMutation({
     mutationFn: register,
@@ -86,6 +90,7 @@ export function useRegister() {
       queryClient.invalidateQueries({ queryKey: ['tasks'] });
 
       toast.success('Registration successful!');
+      router.push('/')
     },
     onError: (error) => {
       toast.error(error.message || 'Registration failed');
