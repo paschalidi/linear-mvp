@@ -3,8 +3,6 @@
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import {
-  Home,
-  Search,
   LogOut,
   Hash
 } from 'lucide-react';
@@ -59,7 +57,7 @@ export function Sidebar() {
     );
   }
 
-  if (!auth?.user) return null;
+  if (!auth?.user?.email) return null;
 
   return (
     <div className="flex h-full w-64 flex-col bg-gray-50 border-r border-gray-200">

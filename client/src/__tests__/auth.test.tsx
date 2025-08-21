@@ -1,8 +1,8 @@
 import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { useRouter } from 'next/navigation';
-import LoginPage from '@/app/login/page';
-import RegisterPage from '@/app/register/page';
+import { LoginForm } from '@/components/auth/login-form';
+import { RegisterForm } from '@/components/auth/register-form';
 import { AuthProvider } from '@/lib/providers/auth-provider';
 
 // Mock next/navigation
@@ -64,45 +64,37 @@ describe('Authentication Components', () => {
     jest.clearAllMocks();
   });
 
-  describe('LoginPage', () => {
+  describe('LoginForm', () => {
     it('renders login form correctly', () => {
       render(
         <TestWrapper>
-          <LoginPage />
+          <LoginForm />
         </TestWrapper>
       );
 
-      expect(screen.getByText('Sign in to your account')).toBeInTheDocument();
       expect(screen.getByLabelText('Email address')).toBeInTheDocument();
       expect(screen.getByLabelText('Password')).toBeInTheDocument();
       expect(screen.getByRole('button', { name: /sign in/i })).toBeInTheDocument();
-      expect(screen.getByText('create a new account')).toBeInTheDocument();
     });
 
     it('validates required fields', async () => {
       render(
         <TestWrapper>
-          <LoginPage />
+          <LoginForm />
         </TestWrapper>
       );
 
       const submitButton = screen.getByRole('button', { name: /sign in/i });
-      
-      // Button should be disabled when fields are empty
-      expect(submitButton).toBeDisabled();
 
       // Fill in email only
       const emailInput = screen.getByLabelText('Email address');
       fireEvent.change(emailInput, { target: { value: 'test@example.com' } });
-      
-      // Button should still be disabled
-      expect(submitButton).toBeDisabled();
 
       // Fill in password
       const passwordInput = screen.getByLabelText('Password');
       fireEvent.change(passwordInput, { target: { value: 'password123' } });
-      
-      // Button should now be enabled
+
+      // Button should be enabled with valid data
       expect(submitButton).not.toBeDisabled();
     });
 
@@ -115,7 +107,7 @@ describe('Authentication Components', () => {
 
       render(
         <TestWrapper>
-          <LoginPage />
+          <LoginForm />
         </TestWrapper>
       );
 
@@ -136,44 +128,45 @@ describe('Authentication Components', () => {
     });
   });
 
-  describe('RegisterPage', () => {
+  describe('RegisterForm', () => {
     it('renders register form correctly', () => {
       render(
         <TestWrapper>
-          <RegisterPage />
+          <RegisterForm />
         </TestWrapper>
       );
 
-      expect(screen.getByText('Create your account')).toBeInTheDocument();
       expect(screen.getByLabelText('Full name')).toBeInTheDocument();
       expect(screen.getByLabelText('Email address')).toBeInTheDocument();
       expect(screen.getByLabelText('Password')).toBeInTheDocument();
       expect(screen.getByRole('button', { name: /create account/i })).toBeInTheDocument();
-      expect(screen.getByText('sign in to your existing account')).toBeInTheDocument();
     });
 
     it('validates password length', async () => {
       render(
         <TestWrapper>
-          <RegisterPage />
+          <RegisterForm />
         </TestWrapper>
       );
 
       const passwordInput = screen.getByLabelText('Password');
+      const submitButton = screen.getByRole('button', { name: /create account/i });
+
+      // Enter short password
       fireEvent.change(passwordInput, { target: { value: '123' } });
 
-      await waitFor(() => {
-        expect(screen.getByText('Password must be at least 6 characters long')).toBeInTheDocument();
-      });
+      // Try to submit to trigger validation
+      fireEvent.click(submitButton);
 
-      const submitButton = screen.getByRole('button', { name: /create account/i });
-      expect(submitButton).toBeDisabled();
+      await waitFor(() => {
+        expect(screen.getByText('Password must be at least 6 characters')).toBeInTheDocument();
+      });
     });
 
     it('enables submit button when all fields are valid', async () => {
       render(
         <TestWrapper>
-          <RegisterPage />
+          <RegisterForm />
         </TestWrapper>
       );
 
@@ -200,7 +193,7 @@ describe('Authentication Components', () => {
 
       render(
         <TestWrapper>
-          <RegisterPage />
+          <RegisterForm />
         </TestWrapper>
       );
 

@@ -65,9 +65,21 @@ export async function logout(): Promise<void> {
     await apiRequest('/api/auth/logout', {
       method: 'POST',
     });
-    redirect('/login');
   } catch (error) {
     // Even if server call fails, we'll clear client-side data
     console.error('Server logout failed:', error);
+  } finally {
+    // Always clear cookies on client side regardless of server response
+    const cookieStore = await cookies();
+
+    // Clear the auth token cookie (correct name)
+    cookieStore.delete('auth_token');
+
+    // Clear any other auth-related cookies if they exist
+    cookieStore.delete('refreshToken');
+    cookieStore.delete('sessionId');
+
+    // Redirect to login page
+    redirect('/login');
   }
 }

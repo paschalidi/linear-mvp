@@ -1,8 +1,7 @@
 'use client';
 
-import { createContext, useContext, useEffect } from 'react';
-import { useRouter } from 'next/navigation';
-import { useAuth, useLogin, useRegister, useLogout } from '@/lib/hooks/use-auth';
+import { createContext, useContext } from 'react';
+import { useAuth, useLogin, useLogout, useRegister } from '@/lib/hooks/use-auth';
 import { AuthState, LoginRequest, RegisterRequest } from '@/types/auth';
 
 interface AuthContextType {
