@@ -1,41 +1,24 @@
-# Team Task Board
+# Task Board
 
-A full-stack task management application built with Next.js, Express, Prisma, and PostgreSQL.
+Full-stack task management application with drag-and-drop kanban interface.
 
-## Project Structure
+## Stack
+- **Frontend**: Next.js 15, React 19, TypeScript, Tailwind CSS
+- **Backend**: Express, Prisma, PostgreSQL (Neon)
+- **Auth**: JWT
 
+## Quick Start
+```bash
+npm run dev
 ```
-project-root/
-├── client/                 # Next.js frontend
-│   ├── src/
-│   ├── components/
-│   └── package.json
-├── server/                 # Express backend
-│   ├── src/
-│   │   ├── routes/        # API routes
-│   │   ├── types/         # TypeScript types
-│   │   ├── utils/         # Utility functions
-│   │   └── __tests__/     # Test files
-│   ├── prisma/
-│   │   └── schema.prisma  # Database schema
-│   └── package.json
-├── docker-compose.yml      # PostgreSQL + server containers
-└── README.md
-```
+- Frontend: http://localhost:3000
+- Backend: http://localhost:3001
 
-## Features
+## Database Configuration
 
-- **Task Management**: Create, read, update, and delete tasks
-- **Task Status**: TODO, IN_PROGRESS, DONE
-- **TypeScript**: Fully typed throughout (no `any` types)
-- **Database**: PostgreSQL with Prisma ORM
-- **Testing**: Jest with comprehensive test coverage
-- **Docker**: Containerized database and server
+This project uses a hardcoded Neon PostgreSQL database connection for simplicity and ease of setup. The database URL is directly embedded in:
+- `server/.env.local` (for local development)
+- `docker-compose.yml` (for containerized deployment)
 
-## API Endpoints
-
-- `GET /api/tasks` - List all tasks
-- `GET /api/tasks/:id` - Get a specific task
-- `POST /api/tasks` - Create a new task
-- `PUT /api/tasks/:id` - Update a task
-- `DELETE /api/tasks/:id` - Delete a task
+**Why hardcoded instead of secret environment variables?**
+- **Demo purposes**: Makes the project immediately runnable without additional infrastructure

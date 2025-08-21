@@ -8,6 +8,8 @@
     "client:dev": "cd client && npm run dev",
     "server:down": "docker-compose down",
     "test": "concurrently \"npm run client:test\" \"npm run server:test\"",
+    "client:test": "cd client && npm run test",
+    "server:test": "cd server && npm run test"
   },
   "devDependencies": {
     "concurrently": "^8.2.2"
