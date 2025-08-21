@@ -1,9 +1,10 @@
 'use client';
 
-import { useState, useMemo } from 'react';
+import { useCallback, useMemo, useState } from 'react';
+import { useSearchParams } from 'next/navigation';
 import { Plus, Search } from 'lucide-react';
 import { useTasks, useUpdateTaskStatus } from '@/lib/hooks/use-tasks';
-import { Task, Status } from '@/types/task';
+import { Status, Task } from '@/types/task';
 import { TaskColumn } from './task-column';
 import { AddTaskModal } from './add-task-modal';
 import { TaskDetailDrawer } from './task-detail-drawer';
@@ -33,10 +34,13 @@ export function TaskBoard() {
   const [selectedTask, setSelectedTask] = useState<Task | null>(null);
   const [isAddModalOpen, setIsAddModalOpen] = useState(false);
   const [isDetailDrawerOpen, setIsDetailDrawerOpen] = useState(false);
-  const [searchQuery, setSearchQuery] = useState('');
 
   const { data: tasks = [], error } = useTasks();
   const updateTaskStatusMutation = useUpdateTaskStatus();
+
+  // Get search query from URL for filtering
+  const searchParams = useSearchParams();
+  const searchQuery = searchParams.get('q') || '';
 
   // Drag and drop functionality
   const {
@@ -48,13 +52,15 @@ export function TaskBoard() {
 
   // Filter tasks based on search query
   const filteredTasks = useMemo(() => {
-    if (!searchQuery.trim()) return tasks;
-    
-    const query = searchQuery.toLowerCase();
-    return tasks.filter(
-      (task) =>
-        task.title.toLowerCase().includes(query) ||
-        task.description?.toLowerCase().includes(query)
+    if (!searchQuery.trim()) {
+      return tasks;
+    }
+
+    const query = searchQuery.toLowerCase().trim();
+
+    return tasks.filter((task) =>
+      task.title.toLowerCase().includes(query) ||
+      task.description?.toLowerCase().includes(query)
     );
   }, [tasks, searchQuery]);
 
@@ -69,15 +75,15 @@ export function TaskBoard() {
     }, {} as Record<Status, Task[]>);
   }, [filteredTasks]);
 
-  const handleTaskClick = (task: Task) => {
+  const handleTaskClick = useCallback((task: Task) => {
     setSelectedTask(task);
     setIsDetailDrawerOpen(true);
-  };
+  }, []);
 
-  const handleCloseDetailDrawer = () => {
+  const handleCloseDetailDrawer = useCallback(() => {
     setIsDetailDrawerOpen(false);
     setSelectedTask(null);
-  };
+  }, []);
 
   const handleTaskDropOnColumn = async (taskId: string, newStatus: Status) => {
     try {
@@ -110,11 +116,7 @@ export function TaskBoard() {
 
   return (
     <AppLayout
-      title="My Issues"
-      subtitle="Track and manage your tasks"
       onAddTask={() => setIsAddModalOpen(true)}
-      searchQuery={searchQuery}
-      onSearchChange={setSearchQuery}
     >
 
       {/* Board Content */}
@@ -172,12 +174,6 @@ export function TaskBoard() {
               Try adjusting your search terms or create a new issue.
             </p>
             <div className="flex items-center justify-center gap-3">
-              <Button
-                variant="outline"
-                onClick={() => setSearchQuery('')}
-              >
-                Clear search
-              </Button>
               <Button
                 onClick={() => setIsAddModalOpen(true)}
               >

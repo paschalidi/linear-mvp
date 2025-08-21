@@ -1,25 +1,17 @@
 'use client';
 
-import { Plus, Filter, MoreHorizontal, Search } from 'lucide-react';
+import { Plus, Filter } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
+import { SearchInput } from '@/components/task-board/search-input';
 import { cn } from '@/lib/utils';
 
 interface HeaderProps {
-  title: string;
-  subtitle?: string;
   onAddTask?: () => void;
-  searchQuery?: string;
-  onSearchChange?: (query: string) => void;
   className?: string;
 }
 
 export function Header({
-  title,
-  subtitle,
   onAddTask,
-  searchQuery = '',
-  onSearchChange,
   className
 }: HeaderProps) {
   return (
@@ -30,17 +22,7 @@ export function Header({
       {/* Center and Right side - Search and Actions */}
       <div className="flex items-center gap-4 flex-1 justify-between">
         {/* Search */}
-        {onSearchChange && (
-          <div className="relative max-w-lg w-full">
-            <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
-            <Input
-              placeholder="Search issues..."
-              value={searchQuery}
-              onChange={(e) => onSearchChange(e.target.value)}
-              className="w-full pl-9 h-8 bg-muted/30 border-border text-sm focus:bg-background"
-            />
-          </div>
-        )}
+        <SearchInput />
 
         {/* Actions */}
         <div className="flex items-center gap-4">
