@@ -63,13 +63,13 @@ export function SearchInput({
 
   return (
     <div className="relative max-w-lg w-full">
-      <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+      <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground transition-colors" />
       <Input
         {...register('query')}
         onChange={handleInputChange}
         value={query}
         placeholder={placeholder}
-        className={`w-full pl-9 h-8 bg-muted/30 border-border text-sm focus:bg-background ${className || ''}`}
+        className={`w-full pl-9 h-10 bg-background border-border text-sm shadow-sm hover:bg-muted/30 focus:shadow-md focus:border-ring/50 transition-all duration-200 ${className || ''}`}
       />
     </div>
   );

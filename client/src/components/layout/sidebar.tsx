@@ -33,7 +33,7 @@ export function Sidebar() {
         </div>
 
         {/* Navigation skeleton */}
-        <nav className="flex-1 px-3 pb-4 overflow-y-auto">
+        <nav className="flex-1 px-3 pb-4 overflow-y-auto pt-2">
           <div className="space-y-1">
             <div className="flex items-center gap-3 px-2 py-1.5">
               <div className="h-4 w-4 bg-gray-200 rounded animate-pulse" />
@@ -72,7 +72,7 @@ export function Sidebar() {
       </div>
 
       {/* Navigation */}
-      <nav className="flex-1 px-3 pb-4 overflow-y-auto">
+      <nav className="flex-1 px-3 pb-4 overflow-y-auto pt-2">
         <div className="space-y-1">
           {navigation.map((item) => {
             const isActive = pathname === item.href;

@@ -38,9 +38,10 @@ export function TaskBoard() {
   const { data: tasks = [], error } = useTasks();
   const updateTaskStatusMutation = useUpdateTaskStatus();
 
-  // Get search query from URL for filtering
+  // Get search query and status filter from URL
   const searchParams = useSearchParams();
   const searchQuery = searchParams.get('q') || '';
+  const statusFilter = searchParams.get('status') || '';
 
   // Drag and drop functionality
   const {
@@ -50,19 +51,26 @@ export function TaskBoard() {
     handleTaskDrop
   } = useDragDrop();
 
-  // Filter tasks based on search query
+  // Filter tasks based on search query and status
   const filteredTasks = useMemo(() => {
-    if (!searchQuery.trim()) {
-      return tasks;
+    let filtered = tasks;
+
+    // Filter by search query
+    if (searchQuery.trim()) {
+      const query = searchQuery.toLowerCase().trim();
+      filtered = filtered.filter((task) =>
+        task.title.toLowerCase().includes(query) ||
+        task.description?.toLowerCase().includes(query)
+      );
     }
 
-    const query = searchQuery.toLowerCase().trim();
+    // Filter by status
+    if (statusFilter && statusFilter !== 'all') {
+      filtered = filtered.filter((task) => task.status === statusFilter);
+    }
 
-    return tasks.filter((task) =>
-      task.title.toLowerCase().includes(query) ||
-      task.description?.toLowerCase().includes(query)
-    );
-  }, [tasks, searchQuery]);
+    return filtered;
+  }, [tasks, searchQuery, statusFilter]);
 
   // Group tasks by status
   const tasksByStatus = useMemo(() => {
@@ -139,7 +147,7 @@ export function TaskBoard() {
         </div>
 
         {/* Empty State */}
-        {filteredTasks.length === 0 && !searchQuery && (
+        {filteredTasks.length === 0 && !searchQuery && !statusFilter && (
           <div className="text-center py-12">
             <div className="mx-auto h-24 w-24 text-muted-foreground mb-4">
               <svg fill="currentColor" viewBox="0 0 24 24">
@@ -161,8 +169,8 @@ export function TaskBoard() {
           </div>
         )}
 
-        {/* No Search Results */}
-        {filteredTasks.length === 0 && searchQuery && (
+        {/* No Filter Results */}
+        {filteredTasks.length === 0 && (searchQuery || statusFilter) && (
           <div className="text-center py-12">
             <div className="mx-auto h-24 w-24 text-muted-foreground mb-4">
               <Search className="h-full w-full" />
@@ -171,7 +179,7 @@ export function TaskBoard() {
               No issues found
             </h3>
             <p className="text-muted-foreground mb-6">
-              Try adjusting your search terms or create a new issue.
+              Try adjusting your search terms or filters, or create a new issue.
             </p>
             <div className="flex items-center justify-center gap-3">
               <Button
