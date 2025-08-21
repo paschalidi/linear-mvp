@@ -104,7 +104,7 @@ export function TaskColumn({
             "flex items-center justify-center h-32 text-muted-foreground text-sm transition-all duration-200",
             isDragOver && "text-primary/70"
           )}>
-            {isDragOver ? 'Drop here' : 'No issues yet'}
+            {isDragOver && 'Drop here'}
           </div>
         ) : (
           tasks.map((task) => (

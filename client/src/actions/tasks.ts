@@ -3,13 +3,18 @@
 import { revalidateTag } from 'next/cache';
 import { CreateTaskRequest, Task, UpdateTaskRequest } from '@/types/task';
 import { apiRequest } from "@/lib/apiRequest";
+import { getAuthHeaders } from "@/lib/auth-utils";
 
 
 
 
 export async function getTasks(): Promise<Task[]> {
   try {
-    const response = await apiRequest<Task[]>('/api/tasks');
+    const authHeaders = await getAuthHeaders();
+
+    const response = await apiRequest<Task[]>('/api/tasks', {
+      headers: authHeaders
+    });
     return response.data || [];
   } catch (error) {
     console.error('Failed to fetch tasks:', error);
@@ -19,7 +24,11 @@ export async function getTasks(): Promise<Task[]> {
 
 export async function getTask({ id }: { id: string }): Promise<Task> {
   try {
-    const response = await apiRequest<Task>(`/api/tasks/${id}`);
+    const authHeaders = await getAuthHeaders();
+
+    const response = await apiRequest<Task>(`/api/tasks/${id}`, {
+      headers: authHeaders
+    });
     if (!response.data) {
       throw new Error('Task not found');
     }
@@ -32,18 +41,21 @@ export async function getTask({ id }: { id: string }): Promise<Task> {
 
 export async function createTask(task: CreateTaskRequest): Promise<Task> {
   try {
+    const authHeaders = await getAuthHeaders();
+
     const response = await apiRequest<Task>('/api/tasks', {
       method: 'POST',
       body: JSON.stringify(task),
+      headers: authHeaders
     });
-    
+
     if (!response.data) {
       throw new Error('Failed to create task');
     }
 
     // Revalidate the tasks cache
     revalidateTag('tasks');
-    
+
     return response.data;
   } catch (error) {
     console.error('Failed to create task:', error);
@@ -53,9 +65,12 @@ export async function createTask(task: CreateTaskRequest): Promise<Task> {
 
 export async function updateTask({ id, updates }: { id: string; updates: UpdateTaskRequest }): Promise<Task> {
   try {
+    const authHeaders = await getAuthHeaders();
+
     const response = await apiRequest<Task>(`/api/tasks/${id}`, {
       method: 'PUT',
       body: JSON.stringify(updates),
+      headers: authHeaders
     });
 
     if (!response.data) {
@@ -74,8 +89,11 @@ export async function updateTask({ id, updates }: { id: string; updates: UpdateT
 
 export async function deleteTask({ id }: { id: string }): Promise<void> {
   try {
+    const authHeaders = await getAuthHeaders();
+
     await apiRequest(`/api/tasks/${id}`, {
       method: 'DELETE',
+      headers: authHeaders
     });
 
     // Revalidate the tasks cache

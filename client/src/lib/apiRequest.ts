@@ -18,13 +18,13 @@ export async function apiRequest<T>(
 
   try {
     const response = await fetch(url, {
+      ...options,
       headers: {
         'Content-Type': 'application/json',
         ...options.headers,
       },
       credentials: 'include', // Include cookies for authentication
       cache: 'no-store',
-      ...options,
     });
 
     const data = await response.json();
