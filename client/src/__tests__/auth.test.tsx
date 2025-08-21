@@ -18,6 +18,15 @@ jest.mock('@/actions/auth', () => ({
   logout: jest.fn(),
 }));
 
+// Mock auth server
+jest.mock('@/lib/auth-server', () => ({
+  getCurrentUser: jest.fn(() => Promise.resolve({
+    id: '1',
+    email: 'test@example.com',
+    name: 'Test User'
+  })),
+}));
+
 // Mock sonner toast
 jest.mock('sonner', () => ({
   toast: {
