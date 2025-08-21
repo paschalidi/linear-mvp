@@ -10,7 +10,7 @@ export interface AuthenticatedRequest extends Request {
 }
 
 /**
- * Middleware to authenticate JWT tokens
+ * Middleware to authenticate JWT tokens from Authorization header
  */
 export const authenticateToken = (
   req: AuthenticatedRequest,
