@@ -78,7 +78,9 @@ describe('Task Routes', () => {
     it('should handle database errors', async () => {
       mockPrisma.task.findMany.mockRejectedValue(new Error('Database error'));
 
-      const response = await request(app).get('/api/tasks');
+      const response = await request(app)
+        .get('/api/tasks')
+        .set('Authorization', `Bearer ${authToken}`);
 
       expect(response.status).toBe(500);
       expect(response.body.success).toBe(false);
@@ -93,13 +95,16 @@ describe('Task Routes', () => {
         title: 'Test Task',
         description: 'Test Description',
         status: Status.TODO,
+        userId,
         createdAt: new Date('2024-01-01'),
         updatedAt: new Date('2024-01-01'),
       };
 
-      mockPrisma.task.findUnique.mockResolvedValue(mockTask);
+      mockPrisma.task.findFirst.mockResolvedValue(mockTask);
 
-      const response = await request(app).get('/api/tasks/task-1');
+      const response = await request(app)
+        .get('/api/tasks/task-1')
+        .set('Authorization', `Bearer ${authToken}`);
 
       expect(response.status).toBe(200);
       expect(response.body.success).toBe(true);
@@ -107,9 +112,11 @@ describe('Task Routes', () => {
     });
 
     it('should return 404 for non-existent task', async () => {
-      mockPrisma.task.findUnique.mockResolvedValue(null);
+      mockPrisma.task.findFirst.mockResolvedValue(null);
 
-      const response = await request(app).get('/api/tasks/non-existent');
+      const response = await request(app)
+        .get('/api/tasks/non-existent')
+        .set('Authorization', `Bearer ${authToken}`);
 
       expect(response.status).toBe(404);
       expect(response.body.success).toBe(false);
@@ -136,6 +143,7 @@ describe('Task Routes', () => {
 
       const response = await request(app)
         .post('/api/tasks')
+        .set('Authorization', `Bearer ${authToken}`)
         .send(newTask);
 
       expect(response.status).toBe(201);
@@ -147,6 +155,7 @@ describe('Task Routes', () => {
     it('should return 400 for missing title', async () => {
       const response = await request(app)
         .post('/api/tasks')
+        .set('Authorization', `Bearer ${authToken}`)
         .send({ description: 'No title' });
 
       expect(response.status).toBe(400);
@@ -157,7 +166,8 @@ describe('Task Routes', () => {
     it('should return 400 for invalid status', async () => {
       const response = await request(app)
         .post('/api/tasks')
-        .send({ 
+        .set('Authorization', `Bearer ${authToken}`)
+        .send({
           title: 'Valid Title',
           status: 'INVALID_STATUS'
         });

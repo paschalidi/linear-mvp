@@ -1,20 +1,34 @@
 import request from 'supertest';
-import { app } from '../index';
-import { prisma } from '../index';
+import express from 'express';
 import { hashPassword } from '../utils/auth';
 
-describe('Auth Routes', () => {
-  beforeEach(async () => {
-    // Clean up database before each test
-    await prisma.task.deleteMany();
-    await prisma.user.deleteMany();
-  });
+// Mock the prisma instance
+const mockPrisma = {
+  user: {
+    findUnique: jest.fn(),
+    create: jest.fn(),
+    deleteMany: jest.fn(),
+  },
+  task: {
+    deleteMany: jest.fn(),
+  },
+  $disconnect: jest.fn(),
+};
 
-  afterAll(async () => {
-    // Clean up and close database connection
-    await prisma.task.deleteMany();
-    await prisma.user.deleteMany();
-    await prisma.$disconnect();
+// Mock the prisma import
+jest.mock('../index', () => ({
+  prisma: mockPrisma,
+}));
+
+import authRoutes from '../routes/auth';
+
+const app = express();
+app.use(express.json());
+app.use('/api/auth', authRoutes);
+
+describe('Auth Routes', () => {
+  beforeEach(() => {
+    jest.clearAllMocks();
   });
 
   describe('POST /api/auth/register', () => {
@@ -24,6 +38,18 @@ describe('Auth Routes', () => {
         password: 'password123',
         name: 'Test User'
       };
+
+      const mockUser = {
+        id: 'user-123',
+        email: userData.email,
+        name: userData.name,
+        password: 'hashed-password',
+        createdAt: new Date(),
+        updatedAt: new Date(),
+      };
+
+      mockPrisma.user.findUnique.mockResolvedValue(null); // User doesn't exist
+      mockPrisma.user.create.mockResolvedValue(mockUser);
 
       const response = await request(app)
         .post('/api/auth/register')
@@ -76,13 +102,17 @@ describe('Auth Routes', () => {
         name: 'Test User'
       };
 
-      // Register first user
-      await request(app)
-        .post('/api/auth/register')
-        .send(userData)
-        .expect(201);
+      const existingUser = {
+        id: 'existing-user',
+        email: userData.email,
+        name: 'Existing User',
+        password: 'hashed-password',
+        createdAt: new Date(),
+        updatedAt: new Date(),
+      };
 
-      // Try to register with same email
+      mockPrisma.user.findUnique.mockResolvedValue(existingUser); // User already exists
+
       const response = await request(app)
         .post('/api/auth/register')
         .send(userData)
@@ -94,23 +124,23 @@ describe('Auth Routes', () => {
   });
 
   describe('POST /api/auth/login', () => {
-    beforeEach(async () => {
-      // Create a test user
-      const hashedPassword = await hashPassword('password123');
-      await prisma.user.create({
-        data: {
-          email: 'test@example.com',
-          password: hashedPassword,
-          name: 'Test User'
-        }
-      });
-    });
-
     it('should login user with correct credentials', async () => {
       const loginData = {
         email: 'test@example.com',
         password: 'password123'
       };
+
+      const hashedPassword = await hashPassword('password123');
+      const mockUser = {
+        id: 'user-123',
+        email: loginData.email,
+        password: hashedPassword,
+        name: 'Test User',
+        createdAt: new Date(),
+        updatedAt: new Date(),
+      };
+
+      mockPrisma.user.findUnique.mockResolvedValue(mockUser);
 
       const response = await request(app)
         .post('/api/auth/login')
@@ -129,6 +159,18 @@ describe('Auth Routes', () => {
         password: 'wrongpassword'
       };
 
+      const hashedPassword = await hashPassword('password123');
+      const mockUser = {
+        id: 'user-123',
+        email: loginData.email,
+        password: hashedPassword,
+        name: 'Test User',
+        createdAt: new Date(),
+        updatedAt: new Date(),
+      };
+
+      mockPrisma.user.findUnique.mockResolvedValue(mockUser);
+
       const response = await request(app)
         .post('/api/auth/login')
         .send(loginData)
@@ -144,6 +186,8 @@ describe('Auth Routes', () => {
         password: 'password123'
       };
 
+      mockPrisma.user.findUnique.mockResolvedValue(null); // User doesn't exist
+
       const response = await request(app)
         .post('/api/auth/login')
         .send(loginData)
@@ -155,33 +199,30 @@ describe('Auth Routes', () => {
   });
 
   describe('GET /api/auth/me', () => {
-    let authToken: string;
-    let userId: string;
-
-    beforeEach(async () => {
-      // Register and login a user to get auth token
-      const userData = {
+    it('should get current user with valid token', async () => {
+      const mockUser = {
+        id: 'user-123',
         email: 'test@example.com',
-        password: 'password123',
-        name: 'Test User'
+        name: 'Test User',
+        password: 'hashed-password',
+        createdAt: new Date(),
+        updatedAt: new Date(),
       };
 
-      const response = await request(app)
-        .post('/api/auth/register')
-        .send(userData);
+      // Mock user lookup for token validation
+      mockPrisma.user.findUnique.mockResolvedValue(mockUser);
 
-      authToken = response.body.data.token;
-      userId = response.body.data.user.id;
-    });
+      // Generate a valid token for testing
+      const { generateToken } = require('../utils/auth');
+      const authToken = generateToken({ userId: mockUser.id, email: mockUser.email });
 
-    it('should get current user with valid token', async () => {
       const response = await request(app)
         .get('/api/auth/me')
         .set('Authorization', `Bearer ${authToken}`)
         .expect(200);
 
       expect(response.body.success).toBe(true);
-      expect(response.body.data.id).toBe(userId);
+      expect(response.body.data.id).toBe(mockUser.id);
       expect(response.body.data.email).toBe('test@example.com');
     });
 
