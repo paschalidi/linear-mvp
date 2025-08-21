@@ -16,9 +16,10 @@ export default async function Home() {
   const queryClient = getQueryClient();
 
   // Prefetch tasks on the server side since we know user is authenticated
+  // IMPORTANT: Use user-specific query key to prevent cache sharing
   try {
     await queryClient.prefetchQuery({
-      queryKey: ['tasks'],
+      queryKey: ['tasks', user.id], // Include user ID in query key
       queryFn: getTasks,
       staleTime: 30 * 1000,
     });
