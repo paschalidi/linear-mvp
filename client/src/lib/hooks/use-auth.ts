@@ -30,12 +30,8 @@ export function useLogin() {
   return useMutation({
     mutationFn: login,
     onSuccess: (data) => {
-      // Update auth state in cache
-      queryClient.setQueryData(authKeys.user, {
-        user: data.user,
-        token: null, // Token is in HTTP-only cookie
-        isAuthenticated: true
-      });
+      // Update auth state in cache - just store the user data directly
+      queryClient.setQueryData(authKeys.user, data.user);
 
       // Invalidate tasks to refetch user's tasks
       queryClient.invalidateQueries({ queryKey: ['tasks'] });
@@ -56,12 +52,8 @@ export function useRegister() {
   return useMutation({
     mutationFn: register,
     onSuccess: (data) => {
-      // Update auth state in cache
-      queryClient.setQueryData(authKeys.user, {
-        user: data.user,
-        token: null, // Token is in HTTP-only cookie
-        isAuthenticated: true
-      });
+      // Update auth state in cache - just store the user data directly
+      queryClient.setQueryData(authKeys.user, data.user);
 
       // Invalidate tasks to refetch user's tasks
       queryClient.invalidateQueries({ queryKey: ['tasks'] });
@@ -81,12 +73,8 @@ export function useLogout() {
   return useMutation({
     mutationFn: logoutAction,
     onSuccess: () => {
-      // Update auth state
-      queryClient.setQueryData(authKeys.user, {
-        user: null,
-        token: null,
-        isAuthenticated: false
-      });
+      // Update auth state - set user to null
+      queryClient.setQueryData(authKeys.user, null);
 
       // Clear all cached data
       queryClient.clear();
