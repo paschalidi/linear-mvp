@@ -2,7 +2,7 @@
 
 import { useState, useMemo } from 'react';
 import { Plus, Search } from 'lucide-react';
-import { useTasks, useUpdateTask } from '@/lib/hooks/use-tasks';
+import { useTasks, useUpdateTaskStatus } from '@/lib/hooks/use-tasks';
 import { Task, Status } from '@/types/task';
 import { TaskColumn } from './task-column';
 import { AddTaskModal } from './add-task-modal';
@@ -36,7 +36,7 @@ export function TaskBoard() {
   const [searchQuery, setSearchQuery] = useState('');
 
   const { data: tasks = [], error } = useTasks();
-  const updateTaskMutation = useUpdateTask();
+  const updateTaskStatusMutation = useUpdateTaskStatus();
 
   // Drag and drop functionality
   const {
@@ -81,9 +81,9 @@ export function TaskBoard() {
 
   const handleTaskDropOnColumn = async (taskId: string, newStatus: Status) => {
     try {
-      await updateTaskMutation.mutateAsync({
+      await updateTaskStatusMutation.mutateAsync({
         id: taskId,
-        updates: { status: newStatus }
+        status: newStatus
       });
     } catch (error) {
       console.error('Failed to update task status:', error);

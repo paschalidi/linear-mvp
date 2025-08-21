@@ -18,7 +18,46 @@ const navigation = [
 
 export function Sidebar() {
   const pathname = usePathname();
-  const { auth, logout } = useAuthContext();
+  const { auth, logout, isLoading } = useAuthContext();
+
+  // Show loading state to prevent screen jumping
+  if (isLoading) {
+    return (
+      <div className="flex h-full w-64 flex-col bg-gray-50 border-r border-gray-200">
+        {/* Header */}
+        <div className="flex h-14 items-center px-4 border-b border-gray-200">
+          <div className="flex items-center gap-2">
+            <div className="h-6 w-6 rounded bg-blue-600 flex items-center justify-center">
+              <span className="text-xs font-semibold text-white">T</span>
+            </div>
+            <span className="font-semibold text-gray-900">TaskBoard</span>
+          </div>
+        </div>
+
+        {/* Navigation skeleton */}
+        <nav className="flex-1 px-3 pb-4 overflow-y-auto">
+          <div className="space-y-1">
+            <div className="flex items-center gap-3 px-2 py-1.5">
+              <div className="h-4 w-4 bg-gray-200 rounded animate-pulse" />
+              <div className="h-4 w-16 bg-gray-200 rounded animate-pulse" />
+            </div>
+          </div>
+        </nav>
+
+        {/* User section skeleton */}
+        <div className="border-t border-gray-200 p-3">
+          <div className="flex items-center gap-3 px-2 py-1.5">
+            <div className="h-6 w-6 rounded-full bg-gray-200 animate-pulse" />
+            <div className="flex-1 min-w-0">
+              <div className="h-4 w-20 bg-gray-200 rounded animate-pulse mb-1" />
+              <div className="h-3 w-24 bg-gray-200 rounded animate-pulse" />
+            </div>
+            <div className="h-6 w-6 bg-gray-200 rounded animate-pulse" />
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   if (!auth?.user) return null;
 

@@ -65,6 +65,7 @@ jest.mock('@/lib/hooks/use-tasks', () => ({
   useTasks: jest.fn(),
   useCreateTask: jest.fn(),
   useUpdateTask: jest.fn(),
+  useUpdateTaskStatus: jest.fn(),
   useDeleteTask: jest.fn(),
 }));
 
@@ -138,12 +139,16 @@ describe('TaskBoard', () => {
     });
 
     // Mock mutation hooks
-    const { useCreateTask, useUpdateTask, useDeleteTask } = require('@/lib/hooks/use-tasks');
+    const { useCreateTask, useUpdateTask, useUpdateTaskStatus, useDeleteTask } = require('@/lib/hooks/use-tasks');
     useCreateTask.mockReturnValue({
       mutateAsync: jest.fn(),
       isPending: false
     });
     useUpdateTask.mockReturnValue({
+      mutateAsync: jest.fn(),
+      isPending: false
+    });
+    useUpdateTaskStatus.mockReturnValue({
       mutateAsync: jest.fn(),
       isPending: false
     });

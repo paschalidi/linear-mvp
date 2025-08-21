@@ -120,6 +120,17 @@ export function useUpdateTaskStatus() {
       // Return a context object with the snapshotted value
       return { previousTasks };
     },
+    onSuccess: (updatedTask) => {
+      // Update the cache with the actual server response
+      queryClient.setQueryData<Task[]>(taskKeys.all, (old) => {
+        return old?.map((task) =>
+          task.id === updatedTask.id ? updatedTask : task
+        ) || [];
+      });
+
+      // Update the individual task cache
+      queryClient.setQueryData(taskKeys.detail(updatedTask.id), updatedTask);
+    },
     onError: (error, variables, context) => {
       // If the mutation fails, use the context returned from onMutate to roll back
       if (context?.previousTasks) {
@@ -128,7 +139,7 @@ export function useUpdateTaskStatus() {
       toast.error(error.message || 'Failed to update task status');
     },
     onSettled: () => {
-      // Always refetch after error or success
+      // Always refetch after error or success to ensure consistency
       queryClient.invalidateQueries({ queryKey: taskKeys.all });
     },
   });

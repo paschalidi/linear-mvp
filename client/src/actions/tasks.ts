@@ -19,22 +19,6 @@ export async function getTasks(): Promise<Task[]> {
   }
 }
 
-export async function getTask({ id }: { id: string }): Promise<Task> {
-  try {
-    const authHeaders = await getAuthHeaders();
-
-    const response = await apiRequest<Task>(`/api/tasks/${id}`, {
-      headers: authHeaders
-    });
-    if (!response.data) {
-      throw new Error('Task not found');
-    }
-    return response.data;
-  } catch (error) {
-    console.error('Failed to fetch task:', error);
-    throw new Error(error instanceof Error ? error.message : 'Failed to fetch task');
-  }
-}
 
 export async function createTask(task: CreateTaskRequest): Promise<Task> {
   try {

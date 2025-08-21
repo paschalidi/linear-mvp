@@ -13,9 +13,8 @@ export function useDragDrop() {
   };
 
   const handleTaskDrop = (taskId: string, newStatus: Status, onUpdateTask: (taskId: string, newStatus: Status) => void) => {
-    console.log('WILL ', newStatus);
     if (draggedTask && draggedTask.id === taskId && draggedTask.status !== newStatus) {
-      console.log('Updating task status:', newStatus);
+      // Immediately call the update function which will handle optimistic updates
       onUpdateTask(taskId, newStatus);
     }
     setDraggedTask(null);
