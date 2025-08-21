@@ -14,12 +14,7 @@ jest.mock('sonner', () => ({
   },
 }))
 
-// Mock actions
-jest.mock('@/actions/auth', () => ({
-  login: jest.fn(),
-  register: jest.fn(),
-  logout: jest.fn(),
-}))
+// Mock actions - will be set up in individual test files
 
 // Increase timeout for async operations
 jest.setTimeout(10000)
