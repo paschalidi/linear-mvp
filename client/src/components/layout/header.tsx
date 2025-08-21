@@ -17,18 +17,13 @@ export function Header({
 }: HeaderProps) {
   return (
     <header className={cn(
-      "flex h-16 items-center justify-between border-b border-border bg-background px-4 md:px-6",
+      "border-b border-border bg-background",
       className
     )}>
       {/* Mobile Layout */}
-      <div className="flex md:hidden items-center gap-2 flex-1 justify-between">
-        {/* Mobile Search */}
-        <div className="flex-1 max-w-[200px]">
-          <SearchInput />
-        </div>
-
-        {/* Mobile Actions */}
-        <div className="flex items-center gap-2">
+      <div className="md:hidden">
+        {/* Mobile Actions Row */}
+        <div className="flex h-16 items-center justify-between px-4">
           <StatusFilter />
           {onAddTask && (
             <Button onClick={onAddTask} size="sm" className="h-10 px-3">
@@ -36,10 +31,15 @@ export function Header({
             </Button>
           )}
         </div>
+        
+        {/* Mobile Search Row */}
+        <div className="px-4 pb-4">
+          <SearchInput />
+        </div>
       </div>
 
       {/* Desktop Layout */}
-      <div className="hidden md:flex items-center gap-6 flex-1 justify-between">
+      <div className="hidden md:flex h-16 items-center gap-6 justify-between px-6">
         {/* Search and Filter */}
         <div className="flex items-center gap-6 flex-1 max-w-4xl">
           <SearchInput />
