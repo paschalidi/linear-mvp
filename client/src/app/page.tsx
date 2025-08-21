@@ -19,7 +19,7 @@ export default async function Home() {
   // Prefetch tasks on the server side since we know user is authenticated
   try {
     await queryClient.prefetchQuery({
-      queryKey: taskKeys.all,
+      queryKey: ['tasks'],
       queryFn: getTasks,
       staleTime: 30 * 1000,
     });
