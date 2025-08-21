@@ -40,7 +40,10 @@ export function AppLayout({
 
   return (
     <div className="flex h-screen bg-background">
-      <Sidebar />
+      {/* Sidebar - hidden on mobile (< md breakpoint) */}
+      <div className="hidden md:block">
+        <Sidebar />
+      </div>
       {/* Main content area */}
       <div className="flex flex-1 flex-col overflow-hidden">
         {/* Header */}
