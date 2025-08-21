@@ -4,6 +4,7 @@ import helmet from 'helmet';
 import dotenv from 'dotenv';
 import { PrismaClient } from '@prisma/client';
 import taskRoutes from './routes/tasks';
+import authRoutes from './routes/auth';
 
 // Load environment variables
 dotenv.config();
@@ -24,6 +25,7 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
 // Routes
+app.use('/api/auth', authRoutes);
 app.use('/api/tasks', taskRoutes);
 
 // Health check endpoint

@@ -1,14 +1,20 @@
 import express from 'express';
 import { CreateTaskRequest, UpdateTaskRequest, ApiResponse, TaskResponse, Status, TaskUpdateData } from '../types/task';
 import { transformTask, transformTasks } from '../utils/taskTransformer';
+import { authenticateToken, AuthenticatedRequest } from '../middleware/auth';
 import { prisma } from '../index';
 
 const router = express.Router();
 
-// GET /api/tasks - List all tasks
-router.get('/', async (req, res) => {
+// GET /api/tasks - List all tasks for authenticated user
+router.get('/', authenticateToken, async (req: AuthenticatedRequest, res) => {
   try {
+    const userId = req.user!.id;
+
     const tasks = await prisma.task.findMany({
+      where: {
+        userId
+      },
       orderBy: {
         createdAt: 'desc'
       }
@@ -30,13 +36,17 @@ router.get('/', async (req, res) => {
   }
 });
 
-// GET /api/tasks/:id - Get a specific task
-router.get('/:id', async (req, res) => {
+// GET /api/tasks/:id - Get a specific task for authenticated user
+router.get('/:id', authenticateToken, async (req: AuthenticatedRequest, res) => {
   try {
     const { id } = req.params;
-    
-    const task = await prisma.task.findUnique({
-      where: { id }
+    const userId = req.user!.id;
+
+    const task = await prisma.task.findFirst({
+      where: {
+        id,
+        userId
+      }
     });
 
     if (!task) {
@@ -63,10 +73,11 @@ router.get('/:id', async (req, res) => {
   }
 });
 
-// POST /api/tasks - Create a new task
-router.post('/', async (req, res) => {
+// POST /api/tasks - Create a new task for authenticated user
+router.post('/', authenticateToken, async (req: AuthenticatedRequest, res) => {
   try {
     const { title, description, status }: CreateTaskRequest = req.body;
+    const userId = req.user!.id;
 
     // Validation
     if (!title || title.trim().length === 0) {
@@ -90,7 +101,8 @@ router.post('/', async (req, res) => {
       data: {
         title: title.trim(),
         description: description?.trim() || null,
-        status: status || Status.TODO
+        status: status || Status.TODO,
+        userId
       }
     });
 
@@ -111,15 +123,19 @@ router.post('/', async (req, res) => {
   }
 });
 
-// PUT /api/tasks/:id - Update a task
-router.put('/:id', async (req, res) => {
+// PUT /api/tasks/:id - Update a task for authenticated user
+router.put('/:id', authenticateToken, async (req: AuthenticatedRequest, res) => {
   try {
     const { id } = req.params;
     const { title, description, status }: UpdateTaskRequest = req.body;
+    const userId = req.user!.id;
 
-    // Check if task exists
-    const existingTask = await prisma.task.findUnique({
-      where: { id }
+    // Check if task exists and belongs to user
+    const existingTask = await prisma.task.findFirst({
+      where: {
+        id,
+        userId
+      }
     });
 
     if (!existingTask) {
@@ -176,14 +192,18 @@ router.put('/:id', async (req, res) => {
   }
 });
 
-// DELETE /api/tasks/:id - Delete a task
-router.delete('/:id', async (req, res) => {
+// DELETE /api/tasks/:id - Delete a task for authenticated user
+router.delete('/:id', authenticateToken, async (req: AuthenticatedRequest, res) => {
   try {
     const { id } = req.params;
+    const userId = req.user!.id;
 
-    // Check if task exists
-    const existingTask = await prisma.task.findUnique({
-      where: { id }
+    // Check if task exists and belongs to user
+    const existingTask = await prisma.task.findFirst({
+      where: {
+        id,
+        userId
+      }
     });
 
     if (!existingTask) {
