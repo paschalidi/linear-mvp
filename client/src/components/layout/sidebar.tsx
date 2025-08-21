@@ -34,18 +34,6 @@ export function Sidebar() {
         </div>
       </div>
 
-      {/* Search */}
-      <div className="p-3">
-        <Button
-          variant="ghost"
-          className="w-full justify-start text-gray-500 bg-white border border-gray-200 hover:bg-gray-50"
-          disabled
-        >
-          <Search className="h-4 w-4 mr-2" />
-          Search...
-        </Button>
-      </div>
-
       {/* Navigation */}
       <nav className="flex-1 px-3 pb-4 overflow-y-auto">
         <div className="space-y-1">

@@ -12,8 +12,8 @@ const inter = Inter({
 });
 
 export const metadata: Metadata = {
-  title: "Linear",
-  description: "Linear helps streamline software projects, sprints, tasks, and bug tracking.",
+  title: "Task board",
+  description: "Task board helps streamline software projects, sprints, tasks, and bug tracking.",
 };
 
 export default function RootLayout({
