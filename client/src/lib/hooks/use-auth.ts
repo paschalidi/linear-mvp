@@ -30,11 +30,14 @@ export function useLogin() {
   return useMutation({
     mutationFn: login,
     onSuccess: (data) => {
+      // Clear any existing cache first to prevent data leakage
+      queryClient.clear();
+
       // Update auth state in cache - just store the user data directly
       queryClient.setQueryData(authKeys.user, data.user);
 
-      // Invalidate tasks to refetch user's tasks
-      queryClient.invalidateQueries({ queryKey: ['tasks'] });
+      // Invalidate user-specific tasks to refetch user's tasks
+      queryClient.invalidateQueries({ queryKey: ['tasks', data.user.id] });
 
       toast.success('Login successful!');
       router.push('/');
@@ -52,11 +55,14 @@ export function useRegister() {
   return useMutation({
     mutationFn: register,
     onSuccess: (data) => {
+      // Clear any existing cache first to prevent data leakage
+      queryClient.clear();
+
       // Update auth state in cache - just store the user data directly
       queryClient.setQueryData(authKeys.user, data.user);
 
-      // Invalidate tasks to refetch user's tasks
-      queryClient.invalidateQueries({ queryKey: ['tasks'] });
+      // Invalidate user-specific tasks to refetch user's tasks
+      queryClient.invalidateQueries({ queryKey: ['tasks', data.user.id] });
 
       toast.success('Registration successful!');
       router.push('/')
@@ -69,17 +75,27 @@ export function useRegister() {
 
 export function useLogout() {
   const queryClient = useQueryClient();
+  const router = useRouter();
 
   return useMutation({
     mutationFn: logoutAction,
     onSuccess: () => {
-      // Update auth state - set user to null
-      queryClient.setQueryData(authKeys.user, null);
-
-      // Clear all cached data
+      // CRITICAL: Clear ALL cached data to prevent data leakage between users
       queryClient.clear();
 
+      // Also remove any persisted data if using persistence
+      queryClient.removeQueries();
+
+      // Redirect to login page
+      router.push('/login');
+
       toast.success('Logged out successfully');
+    },
+    onError: (error) => {
+      // Even on error, clear cache for security
+      queryClient.clear();
+      router.push('/login');
+      toast.error(error.message || 'Failed to logout');
     },
   });
 }
