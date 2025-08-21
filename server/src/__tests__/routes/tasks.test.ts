@@ -1,15 +1,20 @@
 import request from 'supertest';
 import express from 'express';
 import { Status } from '@prisma/client';
+import { generateToken } from '../../utils/auth';
 
 // Mock the prisma instance
 const mockPrisma = {
   task: {
     findMany: jest.fn(),
+    findFirst: jest.fn(),
     findUnique: jest.fn(),
     create: jest.fn(),
     update: jest.fn(),
     delete: jest.fn(),
+  },
+  user: {
+    findUnique: jest.fn(),
   },
 };
 
@@ -25,18 +30,24 @@ app.use(express.json());
 app.use('/api/tasks', taskRoutes);
 
 describe('Task Routes', () => {
+  let authToken: string;
+  const userId = 'test-user-id';
+
   beforeEach(() => {
     jest.clearAllMocks();
+    // Generate auth token for tests
+    authToken = generateToken({ userId, email: 'test@example.com' });
   });
 
   describe('GET /api/tasks', () => {
-    it('should return all tasks', async () => {
+    it('should return all tasks for authenticated user', async () => {
       const mockTasks = [
         {
           id: 'task-1',
           title: 'Test Task 1',
           description: 'Description 1',
           status: Status.TODO,
+          userId,
           createdAt: new Date('2024-01-01'),
           updatedAt: new Date('2024-01-01'),
         },
@@ -45,6 +56,7 @@ describe('Task Routes', () => {
           title: 'Test Task 2',
           description: null,
           status: Status.IN_PROGRESS,
+          userId,
           createdAt: new Date('2024-01-02'),
           updatedAt: new Date('2024-01-02'),
         },
@@ -52,7 +64,9 @@ describe('Task Routes', () => {
 
       mockPrisma.task.findMany.mockResolvedValue(mockTasks);
 
-      const response = await request(app).get('/api/tasks');
+      const response = await request(app)
+        .get('/api/tasks')
+        .set('Authorization', `Bearer ${authToken}`);
 
       expect(response.status).toBe(200);
       expect(response.body.success).toBe(true);

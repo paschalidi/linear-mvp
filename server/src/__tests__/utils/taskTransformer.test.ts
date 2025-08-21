@@ -7,6 +7,7 @@ describe('taskTransformer', () => {
     title: 'Test Task',
     description: 'Test Description',
     status: Status.TODO,
+    userId: 'user-123',
     createdAt: new Date('2024-01-01T00:00:00.000Z'),
     updatedAt: new Date('2024-01-02T00:00:00.000Z'),
   };
