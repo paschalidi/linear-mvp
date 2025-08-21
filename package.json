@@ -1,0 +1,15 @@
+{
+  "name": "task-board-monorepo",
+  "version": "1.0.0",
+  "private": true,
+  "scripts": {
+    "dev": "concurrently \"npm run server:dev\" \"npm run client:dev\"",
+    "server:dev": "docker-compose up",
+    "client:dev": "cd client && npm run dev",
+    "server:down": "docker-compose down",
+    "test": "concurrently \"npm run client:test\" \"npm run server:test\"",
+  },
+  "devDependencies": {
+    "concurrently": "^8.2.2"
+  }
+}

@@ -1,0 +1,32 @@
+# Dependencies
+node_modules
+npm-debug.log*
+
+# Build output
+dist
+
+# Environment variables (will be passed via docker-compose)
+.env
+
+# Testing
+coverage
+.nyc_output
+
+# IDE
+.vscode
+.idea
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Git
+.git
+.gitignore
+
+# Docker
+Dockerfile*
+docker-compose*
+
+# Misc
+README.md

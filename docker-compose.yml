@@ -1,41 +1,19 @@
 version: '3.8'
 
 services:
-  postgres:
-    image: postgres:15-alpine
-    container_name: task-board-db
-    environment:
-      POSTGRES_USER: taskboard
-      POSTGRES_PASSWORD: taskboard123
-      POSTGRES_DB: taskboard
-    ports:
-      - "5432:5432"
-    volumes:
-      - postgres_data:/var/lib/postgresql/data
-    healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U taskboard -d taskboard"]
-      interval: 10s
-      timeout: 5s
-      retries: 5
-
   server:
     build:
       context: ./server
       dockerfile: Dockerfile
     container_name: task-board-server
     environment:
-      DATABASE_URL: postgresql://taskboard:taskboard123@postgres:5432/taskboard
+      DATABASE_URL: postgresql://neondb_owner:npg_YXPMZvStau26@ep-restless-butterfly-ad6b6hxr-pooler.c-2.us-east-1.aws.neon.tech/neondb?sslmode=require&channel_binding=require
       NODE_ENV: development
       PORT: 3001
+      CORS_ORIGIN: http://localhost:3000
+      JWT_SECRET: your-super-secret-jwt-key-change-this-in-production
     ports:
       - "3001:3001"
     volumes:
       - ./server:/app
       - /app/node_modules
-    depends_on:
-      postgres:
-        condition: service_healthy
-    command: npm run dev
-
-volumes:
-  postgres_data:
