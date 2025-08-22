@@ -2,15 +2,7 @@
 
 import { useForm } from 'react-hook-form';
 import { useRouter, useSearchParams } from 'next/navigation';
-import { Filter, ChevronDown } from 'lucide-react';
 import { Status } from '@/types/task';
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from '@/components/ui/select';
 import { Button } from '@/components/ui/button';
 
 interface StatusFilterProps {

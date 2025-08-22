@@ -99,8 +99,8 @@ describe('Authentication Components', () => {
     });
 
     it('submits form with valid data', async () => {
-      const { login } = require('@/actions/auth');
-      login.mockResolvedValue({
+      const { login } = await import('@/actions/auth');
+      (login as jest.Mock).mockResolvedValue({
         user: { id: '1', email: 'test@example.com', name: 'Test User' },
         token: 'fake-token'
       });
@@ -185,8 +185,8 @@ describe('Authentication Components', () => {
     });
 
     it('submits form with valid data', async () => {
-      const { register } = require('@/actions/auth');
-      register.mockResolvedValue({
+      const { register } = await import('@/actions/auth');
+      (register as jest.Mock).mockResolvedValue({
         user: { id: '1', email: 'test@example.com', name: 'Test User' },
         token: 'fake-token'
       });

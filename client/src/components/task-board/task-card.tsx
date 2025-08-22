@@ -49,7 +49,7 @@ export function TaskCard({
     onDragEnd?.();
   };
 
-  const handleClick = (e: React.MouseEvent) => {
+  const handleClick = (_e: React.MouseEvent) => {
     // Prevent click when dragging
     if (isDragging) return;
     onClick(task);

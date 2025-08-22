@@ -148,24 +148,24 @@ describe('TaskBoard', () => {
     jest.clearAllMocks();
 
     // Mock router
-    const { useRouter, useSearchParams } = require('next/navigation');
-    useRouter.mockReturnValue({
+    const { useRouter, useSearchParams } = await import('next/navigation');
+    (useRouter as jest.Mock).mockReturnValue({
       push: jest.fn(),
       replace: jest.fn(),
       refresh: jest.fn(),
     });
-    useSearchParams.mockReturnValue(new URLSearchParams());
+    (useSearchParams as jest.Mock).mockReturnValue(new URLSearchParams());
 
     // Mock useTasks hook
-    const { useTasks } = require('@/lib/hooks/use-tasks');
-    useTasks.mockReturnValue({
+    const { useTasks } = await import('@/lib/hooks/use-tasks');
+    (useTasks as jest.Mock).mockReturnValue({
       data: mockTasks,
       error: null,
       isLoading: false
     });
 
     // Mock mutation hooks
-    const { useCreateTask, useUpdateTask, useUpdateTaskStatus, useDeleteTask } = require('@/lib/hooks/use-tasks');
+    const { useCreateTask, useUpdateTask, useUpdateTaskStatus, useDeleteTask } = await import('@/lib/hooks/use-tasks');
     useCreateTask.mockReturnValue({
       mutateAsync: jest.fn(),
       isPending: false
@@ -213,9 +213,9 @@ describe('TaskBoard', () => {
     expect(screen.getByText('Test Task 3')).toBeInTheDocument();
   });
 
-  it('shows error state when tasks fail to load', () => {
-    const { useTasks } = require('@/lib/hooks/use-tasks');
-    useTasks.mockReturnValue({
+  it('shows error state when tasks fail to load', async () => {
+    const { useTasks } = await import('@/lib/hooks/use-tasks');
+    (useTasks as jest.Mock).mockReturnValue({
       data: [],
       error: new Error('Failed to load tasks'),
       isLoading: false
@@ -256,7 +256,8 @@ describe('TaskBoard', () => {
   it('shows no results message when search returns no matches', async () => {
     // Mock search params to simulate a search that returns no results
     const mockSearchParams = new URLSearchParams('q=nonexistent-search-term-xyz');
-    (require('next/navigation').useSearchParams as jest.Mock).mockReturnValue(mockSearchParams);
+    const { useSearchParams } = await import('next/navigation');
+    (useSearchParams as jest.Mock).mockReturnValue(mockSearchParams);
 
     render(
       <TestWrapper>
