@@ -167,11 +167,14 @@ export function useUpdateTaskStatus() {
     onMutate: async ({ id, status }) => {
       if (!isValid) return;
 
-      // Cancel any outgoing refetches and mutations for this task
+      // Cancel any outgoing refetches and mutations for this specific task
       await queryClient.cancelQueries({ queryKey: taskKeys.detail(user!.id, id) });
+      await queryClient.cancelQueries({ queryKey: taskKeys.all(user!.id) });
 
       const previousTasks = queryClient.getQueryData<Task[]>(taskKeys.all(user!.id));
+      const previousTask = queryClient.getQueryData<Task>(taskKeys.detail(user!.id, id));
 
+      // Immediate optimistic update - this happens instantly
       queryClient.setQueryData<Task[]>(taskKeys.all(user!.id), (old) =>
         old?.map((task) =>
           task.id === id
@@ -184,9 +187,10 @@ export function useUpdateTaskStatus() {
         old ? { ...old, status, updatedAt: new Date().toISOString() } : old
       );
 
-      return { previousTasks, taskId: id };
+      return { previousTasks, previousTask, taskId: id };
     },
     onSuccess: (updatedTask) => {
+      // Only update if the server response is different from our optimistic update
       queryClient.setQueryData<Task[]>(taskKeys.all(user!.id), (old) =>
         old?.map((task) =>
           task.id === updatedTask.id ? updatedTask : task
@@ -196,18 +200,19 @@ export function useUpdateTaskStatus() {
       queryClient.setQueryData(taskKeys.detail(user!.id, updatedTask.id), updatedTask);
     },
     onError: (error, variables, context) => {
+      // Revert optimistic updates on error
       if (context?.previousTasks) {
         queryClient.setQueryData(taskKeys.all(user!.id), context.previousTasks);
       }
 
-      if (context?.taskId) {
-        const originalTask = context.previousTasks?.find(t => t.id === context.taskId);
-        if (originalTask) {
-          queryClient.setQueryData(taskKeys.detail(user!.id, context.taskId), originalTask);
-        }
+      if (context?.previousTask) {
+        queryClient.setQueryData(taskKeys.detail(user!.id, context.taskId), context.previousTask);
       }
 
       handleError(error, 'Failed to update task status');
     },
+    // Add retry configuration for better reliability
+    retry: 2,
+    retryDelay: (attemptIndex) => Math.min(1000 * 2 ** attemptIndex, 30000),
   });
 }
