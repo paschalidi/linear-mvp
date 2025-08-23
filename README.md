@@ -1,5 +1,7 @@
 # Task Board
 
+⚡ Live version: https://taskboard-mvp.vercel.app
+
 Full-stack task management application with drag-and-drop kanban interface.
 
 ## Stack
