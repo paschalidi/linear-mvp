@@ -2,6 +2,8 @@
 
 ⚡ Live version: https://taskboard-mvp.vercel.app
 
+And a loom for the reviewer, [~3mins long](https://www.loom.com/share/fd18a9aebf67432cb53122aa9375f346?sid=a0b75e76-8dc4-46b5-bed7-0d1b090fe7d2)
+
 Full-stack task management application with drag-and-drop kanban interface.
 
 ## Stack
