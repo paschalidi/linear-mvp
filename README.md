@@ -8,12 +8,27 @@ Full-stack task management application with drag-and-drop kanban interface.
 - **Auth**: JWT
 
 ## Quick Start
+
+### Prerequisites
+- Node.js 18+ and npm
+- Docker and Docker Compose
+
+### Installation
 ```bash
+# Install root dependencies (concurrently)
 npm i
+```
+
+### Development
+```bash
 npm run dev
 ```
 - Frontend: http://localhost:3000
 - Backend: http://localhost:3001
+
+The `npm run dev` command runs:
+- Server via Docker Compose (PostgreSQL + Express API)
+- Client locally via Next.js dev server
 
 ## Database Configuration
 
