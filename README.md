@@ -9,6 +9,7 @@ Full-stack task management application with drag-and-drop kanban interface.
 
 ## Quick Start
 ```bash
+npm install
 npm run dev
 ```
 - Frontend: http://localhost:3000
