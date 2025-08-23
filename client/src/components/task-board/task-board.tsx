@@ -93,9 +93,9 @@ export function TaskBoard() {
     setSelectedTask(null);
   }, []);
 
-  const handleTaskDropOnColumn = async (taskId: string, newStatus: Status) => {
+  const handleTaskDropOnColumn = (taskId: string, newStatus: Status) => {
     try {
-      await updateTaskStatusMutation.mutateAsync({
+      updateTaskStatusMutation.mutate({
         id: taskId,
         status: newStatus
       });

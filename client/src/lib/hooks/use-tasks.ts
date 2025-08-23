@@ -189,16 +189,6 @@ export function useUpdateTaskStatus() {
 
       return { previousTasks, previousTask, taskId: id };
     },
-    onSuccess: (updatedTask) => {
-      // Only update if the server response is different from our optimistic update
-      queryClient.setQueryData<Task[]>(taskKeys.all(user!.id), (old) =>
-        old?.map((task) =>
-          task.id === updatedTask.id ? updatedTask : task
-        ) || []
-      );
-
-      queryClient.setQueryData(taskKeys.detail(user!.id, updatedTask.id), updatedTask);
-    },
     onError: (error, variables, context) => {
       // Revert optimistic updates on error
       if (context?.previousTasks) {
