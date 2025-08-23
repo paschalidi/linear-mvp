@@ -144,7 +144,7 @@ const TestWrapper = ({ children }: { children: React.ReactNode }) => {
 };
 
 describe('TaskBoard', () => {
-  beforeEach(() => {
+  beforeEach(async () => {
     jest.clearAllMocks();
 
     // Mock router
@@ -166,19 +166,19 @@ describe('TaskBoard', () => {
 
     // Mock mutation hooks
     const { useCreateTask, useUpdateTask, useUpdateTaskStatus, useDeleteTask } = await import('@/lib/hooks/use-tasks');
-    useCreateTask.mockReturnValue({
+    (useCreateTask as jest.Mock).mockReturnValue({
       mutateAsync: jest.fn(),
       isPending: false
     });
-    useUpdateTask.mockReturnValue({
+    (useUpdateTask as jest.Mock).mockReturnValue({
       mutateAsync: jest.fn(),
       isPending: false
     });
-    useUpdateTaskStatus.mockReturnValue({
+    (useUpdateTaskStatus as jest.Mock).mockReturnValue({
       mutateAsync: jest.fn(),
       isPending: false
     });
-    useDeleteTask.mockReturnValue({
+    (useDeleteTask as jest.Mock).mockReturnValue({
       mutateAsync: jest.fn(),
       isPending: false
     });
