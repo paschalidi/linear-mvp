@@ -9,7 +9,7 @@ Full-stack task management application with drag-and-drop kanban interface.
 
 ## Quick Start
 ```bash
-npm install
+npm i
 npm run dev
 ```
 - Frontend: http://localhost:3000
@@ -23,3 +23,25 @@ This project uses a hardcoded Neon PostgreSQL database connection for simplicity
 
 **Why hardcoded instead of secret environment variables?**
 - **Demo purposes**: Makes the project immediately runnable without additional infrastructure
+
+## Future Roadmap
+
+To bring this to production I would spent more time with the following topics:
+
+1. **Boards**
+   - Email invitations to join boards
+   - Allow users to create multiple boards
+
+2. **Real-time Features**
+   - WebSocket implementation for live updates
+   - Live cursors and editing indicators
+   - Conflict resolution for concurrent edits
+
+3. **Testing & Quality**
+   - End-to-end testing (Cypress/Playwright)
+
+4. **Infrastructure**
+   - Proper environment variable management
+   - Database migrations and seeding
+   - Monitoring and error tracking
+   - Scalable WebSocket architecture
